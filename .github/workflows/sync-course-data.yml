@@ -1,0 +1,65 @@
+name: Sync course data
+
+# Every week, copy the course data from EECS Prereqs, which builds and checks it. If it changed
+# (EECS Prereqs merges its own refresh once a month), open a pull request to review.
+# Needs: Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests".
+
+on:
+  schedule:
+    - cron: "0 15 * * 1"  # every Monday
+  workflow_dispatch:       # or run it by hand from the Actions tab
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: Copy the course data from EECS Prereqs
+        run: npm run sync-data | tee sync-log.txt
+
+      # pull requests opened by this workflow don't trigger other workflows, so build here and report in the PR
+      - name: Build the site with the new data
+        id: build
+        continue-on-error: true
+        run: npm run build 2>&1 | tail -20 | tee build-log.txt; test ${PIPESTATUS[0]} -eq 0
+
+      - name: Write the pull request description
+        run: |
+          {
+            echo "Sync of \`data/courses.json\` from [EECS Prereqs](https://eecs-prereqs.vercel.app/courses.json)."
+            echo
+            tail -1 sync-log.txt
+            echo
+            if [ "${{ steps.build.outcome }}" = "success" ]; then
+              echo "✅ The site builds with the new data."
+            else
+              echo "❌ **The site doesn't build with the new data.** Check the build output below before merging."
+            fi
+            echo
+            echo "<details><summary>Build output</summary>"
+            echo
+            echo '```'
+            cat build-log.txt
+            echo '```'
+            echo "</details>"
+          } > pr-body.md
+          rm sync-log.txt build-log.txt
+
+      - uses: peter-evans/create-pull-request@v8.1.1
+        with:
+          branch: sync-course-data
+          commit-message: Sync course data from EECS Prereqs
+          title: Course data sync from EECS Prereqs
+          body-path: pr-body.md
+          add-paths: data/courses.json
+          delete-branch: true
