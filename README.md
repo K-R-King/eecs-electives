@@ -12,6 +12,7 @@ Find the upper-division EECS electives that fit you. Answer five quick questions
   5. What you've already taken.
 - **58 electives ranked** with a match score and reasons: "All about robotics & control", "Counts as a design course", "2 prerequisites to go", "Not usually offered in Spring".
 - **Your path:** every prerequisite you'd still need for the courses you pick, in steps where each step only needs earlier ones. Courses you've taken count their own prerequisites as done (Math 54 covers Math 51 and 52).
+- **Send them to your plan:** "Add these to my 4-year plan" opens EECS Planner with the courses you picked as your electives (`?electives=CS189.CS162`); it schedules them first and checks their prerequisites.
 - **Quick tweaks** for term and design without retaking the quiz, and a **share link** that opens straight to your results.
 - Links to each course's full prerequisite chain on EECS Prereqs, and to the planner.
 - Light and dark mode, and a layout that works on phones.
@@ -41,7 +42,7 @@ Open `http://localhost:3003`.
 
 Tests (`npm test`) check the scoring, the prerequisite path, share links, and that every hand-written course in `lib/profiles.ts` still exists in the synced data.
 
-GitHub Actions typechecks, lints, tests and builds the site on every push (`.github/workflows/ci.yml`).
+GitHub Actions typechecks, lints, tests and builds the site on every push (`.github/workflows/ci.yml`). An accessibility check (axe, in Playwright) runs on the quiz and the results in light and dark mode; run it locally with `npx playwright test` (it starts the dev server, or set `PORT` if 3003 is taken).
 
 ## Course data
 

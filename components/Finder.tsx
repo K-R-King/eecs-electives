@@ -86,7 +86,7 @@ export default function Finder() {
       ) : (
         <div className="rounded-3xl bg-white dark:bg-slate-900 p-6 shadow-xl shadow-berkeley/10 ring-1 ring-slate-200 dark:ring-slate-700 sm:p-10">
           {/* progress */}
-          <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+          <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-widest text-slate-600 dark:text-slate-400">
             <span>Question {step + 1} of {STEPS.length}</span>
             <span className="text-gold-dark dark:text-gold">{STEPS[step]}</span>
           </div>
@@ -175,7 +175,7 @@ export default function Finder() {
                 type="button"
                 onClick={() => go(step + 1)}
                 disabled={!canNext}
-                className="rounded-xl bg-berkeley px-6 py-3 font-semibold text-white shadow-lg shadow-berkeley/30 transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-blue-500"
+                className="rounded-xl bg-berkeley px-6 py-3 font-semibold text-white shadow-lg shadow-berkeley/30 transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-blue-600"
               >
                 {canNext ? "Next →" : "Pick at least one"}
               </button>
@@ -199,7 +199,7 @@ function Question({ title, hint, children }: { title: string; hint: string; chil
   return (
     <div>
       <h2 className="text-2xl font-extrabold tracking-tight text-berkeley dark:text-blue-300 sm:text-3xl">{title}</h2>
-      <p className="mt-1 text-slate-500 dark:text-slate-400">{hint}</p>
+      <p className="mt-1 text-slate-600 dark:text-slate-400">{hint}</p>
       <div className="mt-6">{children}</div>
     </div>
   );
@@ -223,7 +223,7 @@ function Option({ icon, label, blurb, selected, badge, disabled, onClick }: {
       <span className="text-2xl leading-none" aria-hidden>{icon}</span>
       <span className="min-w-0">
         <span className="block font-semibold text-slate-900 dark:text-slate-100">{label}</span>
-        {blurb && <span className="mt-0.5 block text-sm text-slate-500 dark:text-slate-400">{blurb}</span>}
+        {blurb && <span className="mt-0.5 block text-sm text-slate-600 dark:text-slate-400">{blurb}</span>}
       </span>
       {badge && (
         <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-gold text-xs font-bold text-berkeley" aria-label={`choice ${badge}`}>
@@ -291,7 +291,7 @@ function TakenPicker({ taken, onChange }: { taken: string[]; onChange: (taken: s
                   className="flex w-full items-baseline gap-2 px-4 py-2 text-left text-sm hover:bg-gold/10"
                 >
                   <span className="font-semibold">{c.display}</span>
-                  <span className="truncate text-slate-500 dark:text-slate-400">{c.title}</span>
+                  <span className="truncate text-slate-600 dark:text-slate-400">{c.title}</span>
                 </button>
               </li>
             ))}
@@ -355,7 +355,7 @@ function Results({ answers, onEdit, onChange }: { answers: Answers; onEdit: () =
             <button type="button" onClick={share} className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">
               {copied ? "✓ Link copied" : "🔗 Share"}
             </button>
-            <button type="button" onClick={onEdit} className="rounded-xl bg-berkeley px-4 py-2 text-sm font-semibold text-white shadow-md shadow-berkeley/30 transition hover:-translate-y-0.5 dark:bg-blue-500">
+            <button type="button" onClick={onEdit} className="rounded-xl bg-berkeley px-4 py-2 text-sm font-semibold text-white shadow-md shadow-berkeley/30 transition hover:-translate-y-0.5 dark:bg-blue-600">
               ✏️ Change answers
             </button>
           </div>
@@ -382,7 +382,7 @@ function Results({ answers, onEdit, onChange }: { answers: Answers; onEdit: () =
       </div>
 
       {/* path */}
-      <div className="mt-12 rounded-3xl bg-linear-to-br from-berkeley-dark via-berkeley to-[#0b4a7a] p-6 text-white shadow-xl sm:p-8">
+      <div className="mt-12 rounded-3xl bg-berkeley bg-linear-to-br from-berkeley-dark via-berkeley to-[#0b4a7a] p-6 text-white shadow-xl sm:p-8">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="text-2xl font-extrabold tracking-tight">🧭 Your path</h2>
@@ -391,8 +391,12 @@ function Results({ answers, onEdit, onChange }: { answers: Answers; onEdit: () =
               Toggle courses with <span className="font-semibold text-gold">+ Path</span>.
             </p>
           </div>
-          <a href={siteUrl("planner")} className="rounded-xl bg-gold px-4 py-2 text-sm font-semibold text-berkeley shadow-lg shadow-gold/30 transition hover:-translate-y-0.5">
-            Plan it semester by semester →
+          {/* the planner schedules the picked electives first (it reads ?electives=) */}
+          <a
+            href={picked.length ? `${siteUrl("planner")}/?electives=${picked.join(".")}` : siteUrl("planner")}
+            className="rounded-xl bg-gold px-4 py-2 text-sm font-semibold text-berkeley shadow-lg shadow-gold/30 transition hover:-translate-y-0.5"
+          >
+            {picked.length ? `Add ${picked.length === 1 ? "it" : `these ${picked.length}`} to my 4-year plan →` : "Plan it semester by semester →"}
           </a>
         </div>
         {steps.length ? (
@@ -440,7 +444,7 @@ function Results({ answers, onEdit, onChange }: { answers: Answers; onEdit: () =
         </div>
       )}
 
-      <p className="mt-10 text-center text-xs text-slate-500 dark:text-slate-400">
+      <p className="mt-10 text-center text-xs text-slate-600 dark:text-slate-400">
         Matches weigh your interests most, then your goal, learning style, readiness and the design requirement.
         Prerequisites and terms are official; how each course leans (topics, projects vs. proofs) is our own read of its catalog description.
       </p>
@@ -478,7 +482,7 @@ function ResultCard({ result, rank, big, picked, onPick }: { result: Result; ran
           <p className="flex items-center gap-2">
             {rank && <span className="rounded-full bg-gold px-2 py-0.5 text-[10px] font-bold text-berkeley">#{rank}</span>}
             <span className="text-lg font-extrabold text-berkeley dark:text-blue-300">{c.display}</span>
-            <span className="text-xs text-slate-400">{c.units}u</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">{c.units}u</span>
           </p>
           <p className="font-semibold leading-snug text-slate-800 dark:text-slate-100">{c.title}</p>
         </div>
@@ -505,7 +509,7 @@ function ResultCard({ result, rank, big, picked, onPick }: { result: Result; ran
       {big && c.description && <p className="mt-3 line-clamp-4 text-sm text-slate-600 dark:text-slate-400">{c.description}</p>}
 
       {result.missing.length > 0 && (
-        <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+        <p className="mt-3 text-xs text-slate-600 dark:text-slate-400">
           Needs first: {result.missing.map((g) => g.map((x) => COURSES[x].display).join(" or ")).join("; ")}
         </p>
       )}
