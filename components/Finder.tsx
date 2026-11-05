@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { COURSES, number } from "@/lib/courses";
 import { COMMON_TAKEN, DESIGN, GOALS, INTERESTS, PROFILES, STYLES } from "@/lib/profiles";
 import { DEFAULT_ANSWERS, decode, encode, pathTo, score, type Answers, type Result, type Term } from "@/lib/score";
+import { rememberedTaken, rememberTaken, takeIncoming } from "@/lib/handoff";
 import { siteUrl } from "@/lib/suite";
 
 const STORAGE_KEY = "eecs-electives:answers";
@@ -31,19 +32,30 @@ export default function Finder() {
   const [answers, setAnswers] = useState<Answers>(DEFAULT_ANSWERS);
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const topRef = useRef<HTMLDivElement>(null);
 
   // a shared link (#i=ai...) opens straight to its results; otherwise pick up where you left off
   useEffect(() => {
     const shared = decode(window.location.hash.slice(1));
     const saved = shared ?? load();
+    // add courses marked as taken on a sister site (?taken=...)
+    const incoming = (takeIncoming() ?? []).filter((c) => COURSES[c] && !saved?.taken.includes(c));
+    const start = incoming.length ? { ...(saved ?? DEFAULT_ANSWERS), taken: [...(saved?.taken ?? []), ...incoming] } : saved;
     /* eslint-disable react-hooks/set-state-in-effect */
+    if (start) setAnswers(start);
     if (saved) {
-      setAnswers(saved);
       setDone(true);
+      if (incoming.length) save(start!);
     }
+    setLoaded(true);
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
+
+  // hand the taken list to the sister sites (keeping any courses this site doesn't list)
+  useEffect(() => {
+    if (loaded) rememberTaken([...answers.taken, ...rememberedTaken().filter((c) => !COURSES[c])]);
+  }, [loaded, answers.taken]);
 
   const update = (patch: Partial<Answers>) => setAnswers((a) => ({ ...a, ...patch }));
 
