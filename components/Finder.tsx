@@ -237,11 +237,13 @@ function Option({ icon, label, blurb, selected, badge, disabled, onClick }: {
 function TakenPicker({ taken, onChange }: { taken: string[]; onChange: (taken: string[]) => void }) {
   const [query, setQuery] = useState("");
   const toggle = (code: string) => onChange(taken.includes(code) ? taken.filter((c) => c !== code) : [...taken, code]);
-  const q = query.trim().toLowerCase().replace(/\s+/g, "");
+  // the catalog and CalCentral say ELENG and COMPSCI; this data says EE and CS
+  const q = query.trim().toLowerCase().replace(/\s+/g, "").replace(/^eleng(?=\d|$)/, "ee").replace(/^compsci(?=\d|$)/, "cs");
   const extra = taken.filter((c) => !COMMON_TAKEN.includes(c));
   const suggestions = q
     ? Object.values(COURSES)
-        .filter((c) => !COMMON_TAKEN.includes(c.code) && !taken.includes(c.code))
+        // seminars and DeCals change topic every term, so having taken one says nothing about readiness
+        .filter((c) => !COMMON_TAKEN.includes(c.code) && !taken.includes(c.code) && !c.kind)
         .filter((c) => c.code.toLowerCase().includes(q) || c.title.toLowerCase().replace(/\s+/g, "").includes(q))
         .sort((a, b) => number(a.code) - number(b.code))
         .slice(0, 8)
