@@ -15,6 +15,8 @@ export type Course = {
   coreqs: string[][];
   class_hours?: number | null;
   outside?: boolean;
+  // seminars, DeCals and special topics (topic changes every term)
+  kind?: string;
 };
 
 export const CHECKED: string = data.checked;
